@@ -4,6 +4,7 @@
     align-items: center;
     min-height: 100vh;
     background-color: #f5f5f5;
+    direction: rtl;
 }
 
 .App-logo {
@@ -41,6 +42,17 @@
     }
 }
 
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
 .dropzone {
     width: 300px;
     height: 300px;
@@ -75,41 +87,39 @@
     border-radius: 8px;
 }
 
-.banner {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: rgba(0, 0, 0, 0.7);
-    border-bottom-left-radius: 8px;
-    border-bottom-right-radius: 8px;
+.controls {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 10px;
-    transition: height 0.3s ease;
+    flex-direction: column;
+    gap: 15px;
+    width: 100%;
+    max-width: 300px;
 }
 
-.banner-text {
-    color: white;
-    direction: rtl;
-    text-align: center;
+.adjustment-options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background-color: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.adjustment-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
     font-family: Arial, sans-serif;
-    font-weight: bold;
-    width: 100%;
-    line-height: 1.2;
-    transition: font-size 0.3s ease;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+}
+
+.adjustment-options input[type="radio"] {
+    cursor: pointer;
+    margin-left: 8px;
 }
 
 .download-button {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 8px 16px;
+    padding: 10px 20px;
     background-color: #007bff;
     color: white;
     border: none;
@@ -117,9 +127,105 @@
     cursor: pointer;
     font-size: 14px;
     transition: background-color 0.2s;
-    z-index: 1;
+    width: 100%;
+    font-family: Arial, sans-serif;
 }
 
 .download-button:hover {
     background-color: #0056b3;
+}
+
+.payment-section {
+    width: 100%;
+    background-color: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e0e0e0;
+    margin-top: 20px;
+}
+
+.payment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+}
+
+.form-group label {
+    font-size: 14px;
+    color: #333;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+}
+
+.form-group.half {
+    flex: 1;
+}
+
+.payment-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 15px;
+}
+
+@media (max-height: 700px) {
+    .payment-section {
+        max-height: 90vh;
+        overflow-y: auto;
+        top: 5vh;
+        bottom: auto;
+        transform: translateX(50%);
+    }
+}
+
+.card-element-container {
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    border-radius: 6px;
+    background: white;
+    direction: ltr;
+}
+
+.error-message {
+    color: #dc3545;
+    margin-top: 10px;
+    text-align: right;
+    font-size: 14px;
+}
+
+.amount-setter {
+    margin-bottom: 20px;
+}
+
+.amount-display {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
 }
