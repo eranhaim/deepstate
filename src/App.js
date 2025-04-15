@@ -1,68 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import "./App.css";
-
-const PaymentForm = ({ amount }) => {
-    const [error, setError] = useState(null);
-    const [processing, setProcessing] = useState(false);
-
-    const createOrder = (data, actions) => {
-        return actions.order.create({
-            purchase_units: [
-                {
-                    amount: {
-                        value: amount,
-                        currency_code: "ILS",
-                    },
-                },
-            ],
-        });
-    };
-
-    const onApprove = async (data, actions) => {
-        try {
-            const order = await actions.order.capture();
-            alert("התשלום בוצע בהצלחה!");
-        } catch (err) {
-            setError("אירעה שגיאה בעיבוד התשלום");
-        }
-    };
-
-    const onError = (err) => {
-        setError(err.message);
-    };
-
-    return (
-        <div className="payment-form">
-            <div className="form-group">
-                <label>סכום התרומה</label>
-                <div className="amount-input">
-                    <span className="currency">₪</span>
-                    <input
-                        type="number"
-                        value={amount}
-                        disabled
-                        className="amount-display"
-                    />
-                </div>
-            </div>
-
-            {error && <div className="error-message">{error}</div>}
-
-            <PayPalButtons
-                createOrder={createOrder}
-                onApprove={onApprove}
-                onError={onError}
-                style={{
-                    layout: "vertical",
-                    color: "blue",
-                    shape: "rect",
-                    label: "pay",
-                }}
-            />
-        </div>
-    );
-};
 
 function App() {
     const [image, setImage] = useState(null);
@@ -71,8 +8,6 @@ function App() {
     const canvasRef = useRef(null);
     const previewCanvasRef = useRef(null);
     const [overlayImage, setOverlayImage] = useState(null);
-    const [amount, setAmount] = useState("");
-    const [isProcessing, setIsProcessing] = useState(false);
 
     // Load the overlay image when component mounts
     useEffect(() => {
@@ -87,85 +22,107 @@ function App() {
         loadOverlayImage();
     }, []);
 
-    const renderImageWithEffect = async (canvas, imageSource) => {
-        const ctx = canvas.getContext("2d");
-        const img = new Image();
+    const renderImageWithEffect = useCallback(
+        async (canvas, imageSource) => {
+            const ctx = canvas.getContext("2d");
+            const img = new Image();
 
-        await new Promise((resolve) => {
-            img.onload = resolve;
-            img.src = imageSource;
-        });
+            await new Promise((resolve) => {
+                img.onload = resolve;
+                img.src = imageSource;
+            });
 
-        // Set canvas size to match the image
-        canvas.width = img.width;
-        canvas.height = img.height;
+            // Set canvas size to match the image
+            canvas.width = img.width;
+            canvas.height = img.height;
 
-        // Draw the original image
-        ctx.drawImage(img, 0, 0);
+            // Draw the original image
+            ctx.drawImage(img, 0, 0);
 
-        switch (adjustment) {
-            case "banner":
-                // Add banner and text
-                const bannerHeight = Math.max(60, img.height * 0.15);
-                ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-                ctx.fillRect(
-                    0,
-                    img.height - bannerHeight,
-                    img.width,
-                    bannerHeight
-                );
+            switch (adjustment) {
+                case "banner":
+                    // Add banner and text
+                    const bannerHeight = Math.max(60, img.height * 0.15);
+                    ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
+                    ctx.fillRect(
+                        0,
+                        img.height - bannerHeight,
+                        img.width,
+                        bannerHeight
+                    );
 
-                const text = "רונן בר וגלי מיארה שלטון צללים";
-                const fontSize = bannerHeight * 0.4;
-                ctx.fillStyle = "white";
-                ctx.textAlign = "center";
-                ctx.textBaseline = "middle";
-                ctx.direction = "rtl";
-                ctx.font = `bold ${fontSize}px Arial`;
+                    const text = "רונן בר וגלי מיארה שלטון צללים";
+                    const fontSize = bannerHeight * 0.4;
+                    ctx.fillStyle = "white";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.direction = "rtl";
+                    ctx.font = `bold ${fontSize}px Arial`;
 
-                // Adjust text size if needed
-                let currentFontSize = fontSize;
-                let textWidth = ctx.measureText(text).width;
-                while (textWidth > img.width * 0.9 && currentFontSize > 12) {
-                    currentFontSize--;
-                    ctx.font = `bold ${currentFontSize}px Arial`;
-                    textWidth = ctx.measureText(text).width;
-                }
+                    // Adjust text size if needed
+                    let currentFontSize = fontSize;
+                    let textWidth = ctx.measureText(text).width;
+                    while (
+                        textWidth > img.width * 0.9 &&
+                        currentFontSize > 12
+                    ) {
+                        currentFontSize--;
+                        ctx.font = `bold ${currentFontSize}px Arial`;
+                        textWidth = ctx.measureText(text).width;
+                    }
 
-                ctx.fillText(
-                    text,
-                    img.width / 2,
-                    img.height - bannerHeight / 2
-                );
-                break;
+                    ctx.fillText(
+                        text,
+                        img.width / 2,
+                        img.height - bannerHeight / 2
+                    );
+                    break;
 
-            case "frame":
-                // Add black frame
-                const frameWidth = img.width * 0.05; // 5% of image width
-                ctx.fillStyle = "black";
-                // Top
-                ctx.fillRect(0, 0, img.width, frameWidth);
-                // Bottom
-                ctx.fillRect(0, img.height - frameWidth, img.width, frameWidth);
-                // Left
-                ctx.fillRect(0, 0, frameWidth, img.height);
-                // Right
-                ctx.fillRect(img.width - frameWidth, 0, frameWidth, img.height);
-                break;
+                case "frame":
+                    // Add black frame
+                    const frameWidth = img.width * 0.05; // 5% of image width
+                    ctx.fillStyle = "black";
+                    // Top
+                    ctx.fillRect(0, 0, img.width, frameWidth);
+                    // Bottom
+                    ctx.fillRect(
+                        0,
+                        img.height - frameWidth,
+                        img.width,
+                        frameWidth
+                    );
+                    // Left
+                    ctx.fillRect(0, 0, frameWidth, img.height);
+                    // Right
+                    ctx.fillRect(
+                        img.width - frameWidth,
+                        0,
+                        frameWidth,
+                        img.height
+                    );
+                    break;
 
-            case "overlay":
-                // Add eye overlay with 30% opacity
-                if (overlayImage) {
-                    ctx.globalAlpha = 0.3; // Changed from 0.1 to 0.3 for 30% opacity
-                    ctx.drawImage(overlayImage, 0, 0, img.width, img.height);
-                    ctx.globalAlpha = 1.0; // Reset opacity
-                }
-                break;
+                case "overlay":
+                    // Add eye overlay with 30% opacity
+                    if (overlayImage) {
+                        ctx.globalAlpha = 0.3; // Changed from 0.1 to 0.3 for 30% opacity
+                        ctx.drawImage(
+                            overlayImage,
+                            0,
+                            0,
+                            img.width,
+                            img.height
+                        );
+                        ctx.globalAlpha = 1.0; // Reset opacity
+                    }
+                    break;
 
-            default:
-                break;
-        }
-    };
+                default:
+                    break;
+            }
+        },
+        [adjustment, overlayImage]
+    );
 
     const updatePreview = useCallback(
         async (imageSource) => {
@@ -175,7 +132,7 @@ function App() {
                 previewCanvasRef.current.toDataURL("image/png");
             setPreviewUrl(previewDataUrl);
         },
-        [adjustment, overlayImage]
+        [renderImageWithEffect]
     );
 
     useEffect(() => {
@@ -216,20 +173,9 @@ function App() {
         }, "image/png");
     };
 
-    const handlePayment = async (e) => {
-        e.preventDefault();
-        setIsProcessing(true);
-
-        // Payment processing logic will go here once you provide the details
-        // For now, just a placeholder
-        console.log("Processing payment:", amount);
-
-        setIsProcessing(false);
-    };
-
     return (
         <div className="App">
-            <div
+            {/* <div
                 style={{
                     position: "fixed",
                     bottom: 5,
@@ -238,6 +184,36 @@ function App() {
                 }}
             >
                 <p>נוצר על ידי ערן חיים לכאורה</p>
+            </div> */}
+            <div
+                style={{
+                    position: "fixed",
+                    bottom: 20,
+                    right: 20,
+                    backgroundColor: "rgba(0, 0, 0, 0.8)",
+                    color: "white",
+                    padding: "15px",
+                    borderRadius: "10px",
+                    textAlign: "center",
+                    direction: "rtl",
+                    fontFamily: "Arial",
+                }}
+            >
+                <div
+                    style={{
+                        fontSize: "18px",
+                        fontWeight: "bold",
+                        marginBottom: "10px",
+                    }}
+                >
+                    תרמו למאבק בשלטון הצללים!
+                </div>
+                <div style={{ fontSize: "16px", marginBottom: "10px" }}>
+                    Bit: 0584092012
+                </div>
+                <div style={{ fontSize: "14px" }}>
+                    התרומות יאפשרו להפגנות הימין להתחזק ולגדול
+                </div>
             </div>
             <div className="container">
                 <div
@@ -301,31 +277,6 @@ function App() {
                         >
                             הורד תמונה
                         </button>
-                    </div>
-                )}
-
-                {image && (
-                    <div className="payment-section">
-                        <h3>תרמו למאבק בשלטון הצללים</h3>
-                        <div className="amount-setter">
-                            <input
-                                type="number"
-                                value={amount}
-                                onChange={(e) => setAmount(e.target.value)}
-                                placeholder="הזן סכום"
-                                className="amount-input"
-                            />
-                        </div>
-                        {amount && (
-                            <PayPalScriptProvider
-                                options={{
-                                    "client-id": "YOUR_PAYPAL_CLIENT_ID",
-                                    currency: "ILS",
-                                }}
-                            >
-                                <PaymentForm amount={amount} />
-                            </PayPalScriptProvider>
-                        )}
                     </div>
                 )}
             </div>
