@@ -8,6 +8,7 @@ function App() {
     const canvasRef = useRef(null);
     const previewCanvasRef = useRef(null);
     const [overlayImage, setOverlayImage] = useState(null);
+    const fileInputRef = useRef(null);
 
     // Load the overlay image when component mounts
     useEffect(() => {
@@ -173,6 +174,21 @@ function App() {
         }, "image/png");
     };
 
+    const handleFileSelect = (event) => {
+        const file = event.target.files[0];
+        if (file && file.type.startsWith("image/")) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                setImage(event.target.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleDropZoneClick = () => {
+        fileInputRef.current.click();
+    };
+
     return (
         <div className="App">
             {/* <div
@@ -216,10 +232,19 @@ function App() {
                 </div>
             </div>
             <div className="container">
+                <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileSelect}
+                    accept="image/*"
+                    style={{ display: "none" }}
+                />
                 <div
                     className="dropzone"
+                    onClick={handleDropZoneClick}
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
+                    style={{ cursor: "pointer" }}
                 >
                     {image ? (
                         <div className="image-container">
@@ -230,7 +255,7 @@ function App() {
                             />
                         </div>
                     ) : (
-                        <p>גרור ושחרר את התמונה שלך כאן</p>
+                        <p>לחץ כאן או גרור ושחרר את התמונה שלך</p>
                     )}
                 </div>
 
